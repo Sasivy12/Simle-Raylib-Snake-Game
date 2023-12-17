@@ -83,10 +83,15 @@ void Game::FoodCollision()
 {
 	if (Vector2Equals(snake.Body[0], food.position))
 	{
+		Sound crunch = LoadSound("C:\\Users\\05\\Downloads\\crunch.wav");
+
 		food.position = food.GenerateRandPos();
 		score++;
 		snake.getBigger = true;
+
+		PlaySound(crunch);
 	}
+	
 }
 
 void Game::SnakeBigger()
@@ -128,13 +133,17 @@ void Game::TouchesEdges()
 
 void Game::TouchesItself()
 {
+
 	for (int i = 0; i < snake.Body.size(); i++)
 	{
 		for (int j = i + 1; j < snake.Body.size(); j++)
 		{
 			if (snake.Body[i].x == snake.Body[j].x && snake.Body[i].y == snake.Body[j].y)
 			{
+				Sound death = LoadSound("C:\\Users\\05\\Downloads\\death.wav");
+
 				DeathScreen = true;
+				PlaySound(death);
 			}
 		}
 	}
@@ -151,7 +160,12 @@ int main()
 	InitWindow(cellSize * cellCnt, cellSize * cellCnt, "Snake");
 
 	SetTargetFPS(60);
-	
+
+	InitAudioDevice();
+
+	Music backgroundMusic = LoadMusicStream("C:\\Users\\05\\Downloads\\background_music.mp3");
+	PlayMusicStream(backgroundMusic);
+
 	Game game;
 
 	while (!WindowShouldClose())
@@ -160,6 +174,8 @@ int main()
 
 		if (DeathScreen == true)
 		{
+			UpdateMusicStream(backgroundMusic);
+
 			DrawText("YOU DIED!!!", cellSize * cellCnt / 2 - 150, cellSize * cellCnt / 2 - 60, 60, BLACK);
 			DrawText("Press 'R' to reset", cellSize * cellCnt / 2 - 120, cellSize * cellCnt / 2, 20, BLACK);
 
@@ -174,6 +190,7 @@ int main()
 
 		if(DeathScreen == false)
 		{
+			UpdateMusicStream(backgroundMusic);
 
 			float gameSpeed = 0.2;
 			if (EventTriggered(gameSpeed))
@@ -219,9 +236,9 @@ int main()
 		game.Draw();
 
 		EndDrawing();
-		
 	}
 
+	UnloadMusicStream(backgroundMusic);
 	CloseWindow();
 
 	return 0;
